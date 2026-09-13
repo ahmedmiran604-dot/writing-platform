@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::selection {
+  background-color: #1b2a4a;
+  color: #faf7f2;
+}
+
+body {
+  background-color: #faf7f2;
+}
+
+/* A first-letter drop cap for article openings, in the display serif */
+.drop-cap::first-letter {
+  font-family: var(--font-lora), serif;
+  float: left;
+  font-size: 3.6rem;
+  line-height: 0.78;
+  padding-right: 0.5rem;
+  padding-top: 0.35rem;
+  color: #1b2a4a;
+}
+
+/* A small ornamental divider used between sections, in place of a plain rule */
+.ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #4a1b4a;
+}
+.ornament::before,
+.ornament::after {
+  content: "";
+  height: 1px;
+  width: 48px;
+  background-color: #d8d2c4;
+}
