@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPostBySlug, posts } from "@/lib/sample-data";
+import { getPostBySlug, getReadMinutes, posts } from "@/lib/sample-data";
 
 export function generateStaticParams() {
   return posts.map((post) => ({ slug: post.slug }));
@@ -22,7 +22,7 @@ export default function ReadPage({ params }: { params: { slug: string } }) {
           {post.authorName}
         </Link>
         <span>{post.date}</span>
-        <span>{post.readMinutes} মিনিট পড়া</span>
+        <span>{getReadMinutes(post)} মিনিট পড়া</span>
       </div>
 
       <div className="mt-8 space-y-6 text-lg leading-[1.9] text-ink">

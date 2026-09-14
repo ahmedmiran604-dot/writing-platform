@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Post } from "@/lib/sample-data";
+import { getReadMinutes, type Post } from "@/lib/sample-data";
 
 export default function PostCard({ post }: { post: Post }) {
   return (
@@ -20,7 +20,7 @@ export default function PostCard({ post }: { post: Post }) {
         <Link href={`/profile/${post.authorUsername}`} className="hover:text-navy">
           {post.authorName}
         </Link>
-        <span>{post.readMinutes} মিনিট পড়া</span>
+        <span>{getReadMinutes(post)} মিনিট পড়া</span>
       </div>
     </article>
   );

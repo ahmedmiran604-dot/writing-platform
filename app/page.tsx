@@ -1,6 +1,6 @@
 import Link from "next/link";
 import PostCard from "@/components/PostCard";
-import { posts } from "@/lib/sample-data";
+import { getReadMinutes, posts } from "@/lib/sample-data";
 
 export default function HomePage() {
   const [featured, ...rest] = posts;
@@ -21,7 +21,7 @@ export default function HomePage() {
             {featured.authorName}
           </Link>
           <span>{featured.date}</span>
-          <span>{featured.readMinutes} মিনিট পড়া</span>
+          <span>{getReadMinutes(featured)} মিনিট পড়া</span>
         </div>
         <Link
           href={`/read/${featured.slug}`}

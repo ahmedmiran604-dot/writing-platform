@@ -4,7 +4,6 @@ export type Post = {
   excerpt: string;
   category: string;
   date: string;
-  readMinutes: number;
   authorName: string;
   authorUsername: string;
   content: string[];
@@ -26,7 +25,6 @@ export const posts: Post[] = [
       "শহরের কোলাহলের মাঝে এক টুকরো নীরবতা খুঁজে পাওয়ার গল্প, যেখানে বৃষ্টি হয়ে ওঠে স্মৃতির ভাষা।",
     category: "গল্প",
     date: "২৮ আগস্ট, ২০২৬",
-    readMinutes: 6,
     authorName: "তানভীর হাসান",
     authorUsername: "tanvir-hasan",
     content: [
@@ -42,7 +40,6 @@ export const posts: Post[] = [
       "টিউশনি করানো এক শিক্ষার্থীর চোখে দেখা বাংলাদেশের শিক্ষাব্যবস্থার ছোট্ট একটা ছবি।",
     category: "প্রবন্ধ",
     date: "২ সেপ্টেম্বর, ২০২৬",
-    readMinutes: 8,
     authorName: "নুসরাত জাহান",
     authorUsername: "nusrat-jahan",
     content: [
@@ -57,7 +54,6 @@ export const posts: Post[] = [
       "নীলক্ষেতের ফুটপাতে পুরনো বই খুঁজে বেড়ানো এক পাঠকের আত্মকথন।",
     category: "স্মৃতিচারণ",
     date: "৫ সেপ্টেম্বর, ২০২৬",
-    readMinutes: 5,
     authorName: "রাফিউল ইসলাম",
     authorUsername: "rafiul-islam",
     content: [
@@ -71,7 +67,6 @@ export const posts: Post[] = [
     excerpt: "প্রতিনিয়ত নোটিফিকেশনের ভিড়ে একা থাকার সময়টুকু কীভাবে হারিয়ে যাচ্ছে।",
     category: "মতামত",
     date: "৯ সেপ্টেম্বর, ২০২৬",
-    readMinutes: 7,
     authorName: "তানভীর হাসান",
     authorUsername: "tanvir-hasan",
     content: [
@@ -85,7 +80,6 @@ export const posts: Post[] = [
     excerpt: "শৈশবের বৈশাখী মেলার রঙিন স্মৃতি, যা এখনো মনে দাগ কেটে আছে।",
     category: "স্মৃতিচারণ",
     date: "১১ সেপ্টেম্বর, ২০২৬",
-    readMinutes: 4,
     authorName: "নুসরাত জাহান",
     authorUsername: "nusrat-jahan",
     content: [
@@ -117,6 +111,16 @@ export const authors: Record<string, Author> = {
     followerCount: 61,
   },
 };
+
+/** Estimates reading time from word count (~200 words per minute), minimum 1 minute. */
+export function getReadMinutes(post: Pick<Post, "content">) {
+  const wordCount = post.content
+    .join(" ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.max(1, Math.round(wordCount / 200));
+}
 
 export function getPostBySlug(slug: string) {
   return posts.find((p) => p.slug === slug);
