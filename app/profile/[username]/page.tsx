@@ -2,15 +2,13 @@ import { notFound } from "next/navigation";
 import PostCard from "@/components/PostCard";
 import { authors, getPostsByAuthor } from "@/lib/sample-data";
 
-export function generateStaticParams() {
-  return Object.keys(authors).map((username) => ({ username }));
-}
+export const revalidate = 0;
 
-export default function ProfilePage({ params }: { params: { username: string } }) {
+export default async function ProfilePage({ params }: { params: { username: string } }) {
   const author = authors[params.username];
   if (!author) notFound();
 
-  const authorPosts = getPostsByAuthor(params.username);
+  const authorPosts = await getPostsByAuthor(params.username);
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
@@ -21,8 +19,7 @@ export default function ProfilePage({ params }: { params: { username: string } }
         <div>
           <h1 className="font-display text-2xl text-navy">{author.name}</h1>
           <p className="mt-1 flex gap-4 text-sm text-ink/60">
-            <span>{author.postCount} টি লেখা</span>
-            <span>{author.followerCount} জন অনুসরণকারী</span>
+            <span>{authorPosts.length} টি লেখা</span>
           </p>
         </div>
       </div>

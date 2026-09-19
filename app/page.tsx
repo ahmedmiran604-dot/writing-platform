@@ -1,9 +1,20 @@
 import Link from "next/link";
 import PostCard from "@/components/PostCard";
-import { getReadMinutes, posts } from "@/lib/sample-data";
+import { formatDate, getAllPosts, getReadMinutes } from "@/lib/sample-data";
 
-export default function HomePage() {
+export const revalidate = 0;
+
+export default async function HomePage() {
+  const posts = await getAllPosts();
   const [featured, ...rest] = posts;
+
+  if (!featured) {
+    return (
+      <div className="mx-auto max-w-5xl px-5 py-20 text-center text-ink/60 sm:px-8">
+        এখনো কোনো লেখা প্রকাশিত হয়নি।
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-5 sm:px-8">
@@ -17,10 +28,10 @@ export default function HomePage() {
           {featured.excerpt}
         </p>
         <div className="mt-6 flex items-center gap-4 text-sm text-ink/60">
-          <Link href={`/profile/${featured.authorUsername}`} className="text-ink hover:text-navy">
-            {featured.authorName}
+          <Link href={`/profile/${featured.author_username}`} className="text-ink hover:text-navy">
+            {featured.author_name}
           </Link>
-          <span>{featured.date}</span>
+          <span>{formatDate(featured.created_at)}</span>
           <span>{getReadMinutes(featured)} মিনিট পড়া</span>
         </div>
         <Link
@@ -32,14 +43,16 @@ export default function HomePage() {
       </section>
 
       {/* Recent posts grid */}
-      <section className="py-12 sm:py-16">
-        <h2 className="font-display text-2xl text-navy">সাম্প্রতিক লেখা</h2>
-        <div className="mt-6 grid grid-cols-1 gap-x-10 md:grid-cols-3">
-          {rest.map((post) => (
-            <PostCard key={post.slug} post={post} />
-          ))}
-        </div>
-      </section>
+      {rest.length > 0 && (
+        <section className="py-12 sm:py-16">
+          <h2 className="font-display text-2xl text-navy">সাম্প্রতিক লেখা</h2>
+          <div className="mt-6 grid grid-cols-1 gap-x-10 md:grid-cols-3">
+            {rest.map((post) => (
+              <PostCard key={post.slug} post={post} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="ornament pb-12 text-lg">❧</div>
     </div>

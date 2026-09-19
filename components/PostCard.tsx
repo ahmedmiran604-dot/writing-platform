@@ -17,8 +17,8 @@ export default function PostCard({ post }: { post: Post }) {
       </p>
 
       <div className="flex items-center justify-between pt-1 text-xs text-ink/55">
-        <Link href={`/profile/${post.authorUsername}`} className="hover:text-navy">
-          {post.authorName}
+        <Link href={`/profile/${post.author_username}`} className="hover:text-navy">
+          {post.author_name}
         </Link>
         <span>{getReadMinutes(post)} মিনিট পড়া</span>
       </div>
