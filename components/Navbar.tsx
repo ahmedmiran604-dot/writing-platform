@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 const navLinks = [
   { href: "/", label: "হোম" },
@@ -10,7 +12,45 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setUserName(null);
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("id", user.id)
+        .single();
+
+      setUserName(profile?.name ?? user.email ?? "প্রোফাইল");
+    }
+
+    loadUser();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      loadUser();
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    setUserName(null);
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-hairline bg-cream/95 backdrop-blur">
@@ -44,12 +84,24 @@ export default function Navbar() {
               <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
             </svg>
           </button>
-          <Link
-            href="/login"
-            className="border border-navy px-4 py-1.5 text-sm text-navy transition-colors hover:bg-navy hover:text-cream"
-          >
-            লগইন
-          </Link>
+          {userName ? (
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-ink/80">{userName}</span>
+              <button
+                onClick={handleLogout}
+                className="border border-hairline px-3 py-1.5 text-ink/70 transition-colors hover:border-navy hover:text-navy"
+              >
+                লগআউট
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="border border-navy px-4 py-1.5 text-sm text-navy transition-colors hover:bg-navy hover:text-cream"
+            >
+              লগইন
+            </Link>
+          )}
         </div>
 
         <button
@@ -79,9 +131,21 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link href="/login" onClick={() => setOpen(false)} className="py-2 text-navy">
-            লগইন
-          </Link>
+          {userName ? (
+            <button
+              onClick={() => {
+                setOpen(false);
+                handleLogout();
+              }}
+              className="py-2 text-left text-navy"
+            >
+              লগআউট ({userName})
+            </button>
+          ) : (
+            <Link href="/login" onClick={() => setOpen(false)} className="py-2 text-navy">
+              লগইন
+            </Link>
+          )}
         </nav>
       )}
     </header>
