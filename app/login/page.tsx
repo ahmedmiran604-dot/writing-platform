@@ -67,7 +67,7 @@ export default function LoginPage() {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-5 py-14 sm:px-8">
       <div className="text-center">
-        <span className="font-display text-3xl italic text-navy">লেখাঘর</span>
+        <span className="font-display text-3xl italic text-navy">সাহিত্য</span>
         <p className="mt-2 text-sm text-ink/60">
           {mode === "login" ? "আপনার লেখার জগতে ফিরে আসুন" : "আজই লেখা শুরু করুন"}
         </p>

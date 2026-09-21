@@ -16,9 +16,8 @@ const notoBengali = Noto_Serif_Bengali({
   variable: "--font-bengali",
   display: "swap",
 });
-
 export const metadata: Metadata = {
-  title: "লেখাঘর — লিখুন, প্রকাশ করুন",
+  title: "সাহিত্য — লিখুন, প্রকাশ করুন",
   description: "বাংলাদেশের লেখকদের জন্য লেখালেখি ও প্রকাশনার প্ল্যাটফর্ম",
 };
 
