@@ -55,18 +55,11 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-hairline bg-cream/95 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 sm:px-8">
-      <Link href="/" className="flex items-center gap-2">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-plum">
-            <path
-              d="M12 2C7.5 4 6 8.5 6 13.5C6 17.5 8.7 20.5 12 22C15.3 20.5 18 17.5 18 13.5C18 8.5 16.5 4 12 2Z"
-              stroke="currentColor"
-              strokeWidth="1.3"
-            />
-            <path d="M12 4.5V20.5" stroke="currentColor" strokeWidth="0.8" opacity="0.6" />
-            <ellipse cx="12" cy="9.5" rx="2.4" ry="3.2" fill="currentColor" opacity="0.18" />
-            <ellipse cx="12" cy="9.5" rx="1.2" ry="1.7" fill="currentColor" />
-          </svg>
-          <span className="font-display text-2xl italic text-navy">সাহিত্য</span>
+        <Link href="/" className="flex items-baseline gap-2">
+          <span className="font-display text-2xl italic text-navy">লেখাঘর</span>
+          <span aria-hidden className="text-sm text-plum">
+            ❦
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
@@ -82,7 +75,8 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">
-          <button
+          <Link
+            href="/search"
             aria-label="খুঁজুন"
             className="text-ink/70 transition-colors hover:text-navy"
           >
@@ -90,7 +84,7 @@ export default function Navbar() {
               <circle cx="11" cy="11" r="7" />
               <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
             </svg>
-          </button>
+          </Link>
           {userName ? (
             <div className="flex items-center gap-3 text-sm">
               <span className="text-ink/80">{userName}</span>
@@ -138,6 +132,9 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+          <Link href="/search" onClick={() => setOpen(false)} className="py-2 text-ink/80">
+            খুঁজুন
+          </Link>
           {userName ? (
             <button
               onClick={() => {
