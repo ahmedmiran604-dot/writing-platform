@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import PostCard from "@/components/PostCard";
-import { authors, getPostsByAuthor } from "@/lib/sample-data";
+import { getAuthorByUsername, getPostsByAuthor } from "@/lib/sample-data";
 
 export const revalidate = 0;
 
 export default async function ProfilePage({ params }: { params: { username: string } }) {
-  const author = authors[params.username];
+  const author = await getAuthorByUsername(params.username);
   if (!author) notFound();
 
   const authorPosts = await getPostsByAuthor(params.username);
@@ -13,8 +13,13 @@ export default async function ProfilePage({ params }: { params: { username: stri
   return (
     <div className="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
       <div className="flex items-center gap-5">
-        <div className="flex h-16 w-16 items-center justify-center border border-hairline font-display text-2xl text-navy">
-          {author.name.charAt(0)}
+        <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-hairline">
+          {author.avatar_url ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={author.avatar_url} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <span className="font-display text-2xl text-navy">{author.name.charAt(0)}</span>
+          )}
         </div>
         <div>
           <h1 className="font-display text-2xl text-navy">{author.name}</h1>

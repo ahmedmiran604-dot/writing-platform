@@ -9,6 +9,8 @@ export type Post = {
   content: string;
   author_name: string;
   author_username: string;
+  author_avatar_url: string | null;
+  cover_url: string | null;
   view_count: number;
   created_at: string;
 };
@@ -17,10 +19,11 @@ export type Author = {
   username: string;
   name: string;
   bio: string;
+  avatar_url?: string | null;
 };
 
-// এখনো সত্যিকারের সাইনআপ/লগইন সিস্টেম চালু হয়নি, তাই লেখকদের পরিচিতি আপাতত এখানে রাখা হলো।
-// পরে সাইনআপ চালু হলে এটা profiles টেবিল থেকে আসবে।
+// ডেমো লেখকদের পরিচিতি (এদের জন্য কোনো আসল অ্যাকাউন্ট নেই)।
+// সত্যিকারের সাইনআপ করা লেখকদের তথ্য নিচের ফাংশনে profiles টেবিল থেকে আসে।
 export const authors: Record<string, Author> = {
   "tanvir-hasan": {
     username: "tanvir-hasan",
@@ -38,6 +41,26 @@ export const authors: Record<string, Author> = {
     bio: "বইপোকা, পুরনো বই আর পুরনো গল্পের খোঁজে ঘুরে বেড়াই।",
   },
 };
+
+/** ডেমো লেখক না হলে profiles টেবিলে খুঁজে দেখে — এতে সত্যিকারের সাইনআপ করা লেখকদের প্রোফাইল পেজও কাজ করে। */
+export async function getAuthorByUsername(username: string): Promise<Author | null> {
+  if (authors[username]) return authors[username];
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("username, name, avatar_url")
+    .eq("username", username)
+    .single();
+
+  if (!data) return null;
+
+  return {
+    username: data.username,
+    name: data.name,
+    bio: "এই লেখক এখনও কোনো পরিচিতি যোগ করেননি।",
+    avatar_url: data.avatar_url,
+  };
+}
 
 export async function getAllPosts(): Promise<Post[]> {
   const { data } = await supabase

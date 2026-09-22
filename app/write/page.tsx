@@ -16,20 +16,25 @@ const categories = [
   "থ্রিলার",
   "রোমান্টিক",
   "ফিকশন",
+  "পল্লীসাহিত্য",
 ];
 
 function makeSlug() {
   return crypto.randomUUID().split("-")[0];
 }
 
+type Profile = { name: string; username: string; avatar_url: string | null };
+
 export default function WritePage() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
-  const [profile, setProfile] = useState<{ name: string; username: string } | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState(categories[0]);
   const [content, setContent] = useState("");
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +51,7 @@ export default function WritePage() {
 
       const { data: profileData } = await supabase
         .from("profiles")
-        .select("name, username")
+        .select("name, username, avatar_url")
         .eq("id", user.id)
         .single();
 
@@ -56,6 +61,12 @@ export default function WritePage() {
 
     checkUser();
   }, [router]);
+
+  function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null;
+    setCoverFile(file);
+    setCoverPreview(file ? URL.createObjectURL(file) : null);
+  }
 
   async function handlePublish() {
     setError(null);
@@ -71,6 +82,24 @@ export default function WritePage() {
 
     setPublishing(true);
 
+    let coverUrl: string | null = null;
+
+    if (coverFile) {
+      const path = `${user.id}/${Date.now()}-${coverFile.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from("covers")
+        .upload(path, coverFile);
+
+      if (uploadError) {
+        setError("কভার ছবি আপলোড করা যায়নি: " + uploadError.message);
+        setPublishing(false);
+        return;
+      }
+
+      const { data } = supabase.storage.from("covers").getPublicUrl(path);
+      coverUrl = data.publicUrl;
+    }
+
     const excerpt = content.trim().slice(0, 140);
     const slug = makeSlug();
 
@@ -83,6 +112,8 @@ export default function WritePage() {
       author_id: user.id,
       author_name: profile.name,
       author_username: profile.username,
+      author_avatar_url: profile.avatar_url,
+      cover_url: coverUrl,
     });
 
     if (insertError) {
@@ -128,7 +159,23 @@ export default function WritePage() {
             ))}
           </select>
         </label>
+
+        <label className="flex cursor-pointer items-center gap-2 text-ink/70 hover:text-navy">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <rect x="3" y="5" width="18" height="14" rx="1" />
+            <circle cx="9" cy="10" r="1.5" />
+            <path d="M4 17l5-5 4 4 3-3 4 4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          কভার ছবি
+          <input type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
+        </label>
+        {coverFile && <span className="text-ink/50">{coverFile.name}</span>}
       </div>
+
+      {coverPreview && (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img src={coverPreview} alt="" className="mt-4 h-48 w-full object-cover" />
+      )}
 
       <textarea
         value={content}

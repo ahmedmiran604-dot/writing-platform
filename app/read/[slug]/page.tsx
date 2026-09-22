@@ -19,6 +19,15 @@ export default async function ReadPage({ params }: { params: { slug: string } })
 
   return (
     <article className="mx-auto max-w-prose px-5 py-14 sm:px-8 sm:py-20">
+      {post.cover_url && (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          src={post.cover_url}
+          alt=""
+          className="mb-8 h-56 w-full object-cover sm:h-72"
+        />
+      )}
+
       <p className="text-sm text-plum">{post.category}</p>
       <h1 className="mt-4 font-display text-3xl leading-tight text-navy sm:text-4xl">
         {post.title}

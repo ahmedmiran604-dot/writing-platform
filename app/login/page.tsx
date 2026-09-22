@@ -11,8 +11,16 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null;
+    setAvatarFile(file);
+    setAvatarPreview(file ? URL.createObjectURL(file) : null);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,10 +40,25 @@ export default function LoginPage() {
       }
 
       if (data.user) {
+        let avatarUrl: string | null = null;
+
+        if (avatarFile) {
+          const path = `${data.user.id}/${Date.now()}-${avatarFile.name}`;
+          const { error: uploadError } = await supabase.storage
+            .from("avatars")
+            .upload(path, avatarFile);
+
+          if (!uploadError) {
+            const { data: publicData } = supabase.storage.from("avatars").getPublicUrl(path);
+            avatarUrl = publicData.publicUrl;
+          }
+        }
+
         const { error: profileError } = await supabase.from("profiles").insert({
           id: data.user.id,
           username,
           name,
+          avatar_url: avatarUrl,
         });
 
         if (profileError) {
@@ -76,6 +99,20 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="mt-10 space-y-5">
         {mode === "signup" && (
           <>
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-hairline bg-cream">
+                {avatarPreview ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={avatarPreview} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-xs text-ink/40">ছবি</span>
+                )}
+              </div>
+              <label className="cursor-pointer text-sm text-navy hover:text-plum">
+                প্রোফাইল ছবি যোগ করুন (ঐচ্ছিক)
+                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+              </label>
+            </div>
             <div>
               <label className="text-sm text-ink/70">নাম</label>
               <input

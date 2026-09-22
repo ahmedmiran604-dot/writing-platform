@@ -19,27 +19,39 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-5xl px-5 sm:px-8">
       {/* Hero / featured post */}
-      <section className="border-b border-hairline py-14 sm:py-20">
-        <p className="text-sm text-plum">{featured.category}</p>
-        <h1 className="mt-4 max-w-3xl font-display text-4xl leading-tight text-navy sm:text-5xl">
-          {featured.title}
-        </h1>
-        <p className="mt-5 max-w-xl text-base leading-relaxed text-ink/75">
-          {featured.excerpt}
-        </p>
-        <div className="mt-6 flex items-center gap-4 text-sm text-ink/60">
-          <Link href={`/profile/${featured.author_username}`} className="text-ink hover:text-navy">
-            {featured.author_name}
+      <section className="grid grid-cols-1 items-center gap-8 border-b border-hairline py-14 sm:py-20 md:grid-cols-5 md:gap-12">
+        <div className={featured.cover_url ? "md:col-span-3" : "md:col-span-5"}>
+          <p className="text-sm text-plum">{featured.category}</p>
+          <h1 className="mt-4 max-w-3xl font-display text-4xl leading-tight text-navy sm:text-5xl">
+            {featured.title}
+          </h1>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-ink/75">
+            {featured.excerpt}
+          </p>
+          <div className="mt-6 flex items-center gap-4 text-sm text-ink/60">
+            <Link href={`/profile/${featured.author_username}`} className="text-ink hover:text-navy">
+              {featured.author_name}
+            </Link>
+            <span>{formatDate(featured.created_at)}</span>
+            <span>{getReadMinutes(featured)} মিনিট পড়া</span>
+          </div>
+          <Link
+            href={`/read/${featured.slug}`}
+            className="mt-8 inline-block border-b border-navy pb-0.5 text-navy transition-colors hover:border-plum hover:text-plum"
+          >
+            সম্পূর্ণ পড়ুন
           </Link>
-          <span>{formatDate(featured.created_at)}</span>
-          <span>{getReadMinutes(featured)} মিনিট পড়া</span>
         </div>
-        <Link
-          href={`/read/${featured.slug}`}
-          className="mt-8 inline-block border-b border-navy pb-0.5 text-navy transition-colors hover:border-plum hover:text-plum"
-        >
-          সম্পূর্ণ পড়ুন
-        </Link>
+        {featured.cover_url && (
+          <Link href={`/read/${featured.slug}`} className="block md:col-span-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={featured.cover_url}
+              alt=""
+              className="h-56 w-full object-cover sm:h-72 md:h-80"
+            />
+          </Link>
+        )}
       </section>
 
       {/* Recent posts grid */}

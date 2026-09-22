@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Feather } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const navLinks = [
@@ -15,6 +16,8 @@ export default function Navbar() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+  const [userUsername, setUserUsername] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadUser() {
@@ -24,16 +27,20 @@ export default function Navbar() {
 
       if (!user) {
         setUserName(null);
+        setUserAvatar(null);
+        setUserUsername(null);
         return;
       }
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("name")
+        .select("name, username, avatar_url")
         .eq("id", user.id)
         .single();
 
       setUserName(profile?.name ?? user.email ?? "প্রোফাইল");
+      setUserAvatar(profile?.avatar_url ?? null);
+      setUserUsername(profile?.username ?? null);
     }
 
     loadUser();
@@ -55,11 +62,9 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-hairline bg-cream/95 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 sm:px-8">
-        <Link href="/" className="flex items-baseline gap-2">
-          <span className="font-display text-2xl italic text-navy">লেখাঘর</span>
-          <span aria-hidden className="text-sm text-plum">
-            ❦
-          </span>
+        <Link href="/" className="flex items-center gap-2">
+          <Feather className="h-5 w-5 text-plum" strokeWidth={1.5} />
+          <span className="font-display text-2xl italic text-navy">সাহিত্য</span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
@@ -87,7 +92,20 @@ export default function Navbar() {
           </Link>
           {userName ? (
             <div className="flex items-center gap-3 text-sm">
-              <span className="text-ink/80">{userName}</span>
+              <Link
+                href={userUsername ? `/profile/${userUsername}` : "#"}
+                className="flex items-center gap-2 text-ink/80 hover:text-navy"
+              >
+                {userAvatar ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={userAvatar} alt="" className="h-6 w-6 rounded-full object-cover" />
+                ) : (
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-navy/10 text-xs text-navy">
+                    {userName.charAt(0)}
+                  </span>
+                )}
+                {userName}
+              </Link>
               <button
                 onClick={handleLogout}
                 className="border border-hairline px-3 py-1.5 text-ink/70 transition-colors hover:border-navy hover:text-navy"
